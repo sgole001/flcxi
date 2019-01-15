@@ -2,5 +2,6 @@
 target
 test
 .idea
+.mvn
 .DS_Store
 
