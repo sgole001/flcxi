@@ -1,58 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
+  <groupId>flcxi-love</groupId>
+  <artifactId>user</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>user</name>
+  <description>user server project for Spring Boot</description>
+
+  <parent>
     <groupId>flcxi-love</groupId>
-    <artifactId>user</artifactId>
+    <artifactId>parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>pom</packaging>
+    <relativePath/> <!-- lookup parent from repository -->
+  </parent>
 
-    <name>user</name>
-    <description>user server project for Spring Boot</description>
+  <!--聚合子模块-->
+  <modules>
+    <module>configuration</module>
+    <module>api</module>
+    <module>controller</module>
+    <module>service</module>
+    <module>dao</module>
+  </modules>
 
-    <parent>
-        <groupId>flcxi-love</groupId>
-        <artifactId>parent</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-        <relativePath/> <!-- lookup parent from repository -->
-    </parent>
+  <properties>
+    <flcxi-love.user.server.version>0.0.1-SNAPSHOT</flcxi-love.user.server.version>
+    <flcxi-love.common.version>0.0.1-SNAPSHOT</flcxi-love.common.version>
+  </properties>
 
-    <!--聚合子模块-->
-    <modules>
-        <module>configuration</module>
-        <module>api</module>
-    </modules>
+  <dependencies>
 
-    <properties>
-        <flcxi-love.user.server.version>0.0.1-SNAPSHOT</flcxi-love.user.server.version>
-        <flcxi-love.common.version>0.0.1-SNAPSHOT</flcxi-love.common.version>
-    </properties>
+    <!--引入common依赖-->
+    <dependency>
+      <groupId>flcxi-love</groupId>
+      <artifactId>common</artifactId>
+      <version>${flcxi-love.common.version}</version>
+    </dependency>
 
-    <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 
-        <!--引入common依赖-->
-        <dependency>
-            <groupId>flcxi-love</groupId>
-            <artifactId>common</artifactId>
-            <version>${flcxi-love.common.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>

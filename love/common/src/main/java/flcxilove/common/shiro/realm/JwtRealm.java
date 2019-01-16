@@ -1,5 +1,6 @@
 package flcxilove.common.shiro.realm;
 
+import flcxilove.common.shiro.token.JwtAuthenticationToken;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -26,70 +27,76 @@ import io.jsonwebtoken.Claims;
  */
 public class JwtRealm extends AuthorizingRealm {
 
-    /**
-     * Jwt工具类
-     */
-    private JwtUtil jwtUtil;
+  /**
+   * Jwt工具类
+   */
+  private JwtUtil jwtUtil;
 
-    /**
-     * Redis工具类
-     */
-    private RedisUtil redisUtil;
+  /**
+   * Redis工具类
+   */
+  private RedisUtil redisUtil;
 
-    /**
-     * 权限验证处理方法
-     *
-     * @param principalCollection 用户信息
-     * @return 验证信息
-     */
-    @Override
-    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
+  @Override
+  public boolean supports(AuthenticationToken token) {
+    return token instanceof JwtAuthenticationToken;
+  }
 
-        // 用户ID
-        String clientId = (String) principalCollection.getPrimaryPrincipal();
+  /**
+   * 权限验证处理方法
+   *
+   * @param principalCollection 用户信息
+   *
+   * @return 验证信息
+   */
+  @Override
+  protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
 
-        // 根据用户ID获取用户权限
+    // 用户ID
+    String clientId = (String) principalCollection.getPrimaryPrincipal();
+
+    // 根据用户ID获取用户权限
 //        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
 //        info.setRoles(null);
 //        info.setStringPermissions(null);
 
-        return null;
+    return null;
+  }
+
+  @Override
+  protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
+
+    // 获取JWT信息
+    String token = (String) authenticationToken.getCredentials();
+
+    // 获取对称加密密钥
+    if (!this.redisUtil.exists(token)) {
+      throw new AuthenticationException("token无效 (已过期 | 被篡改)");
     }
+    Map<String, String> specKey = (Map<String, String>) this.redisUtil.get(token);
+    // 密钥encoded
+    byte[] encoded = Base64.decode(specKey.get("encoded"));
+    // 密钥算法
+    String algorithm = specKey.get("algorithm");
+    // 获取密钥
+    SecretKeySpec key = new SecretKeySpec(encoded, algorithm);
 
-    @Override
-    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
+    // 根据JWT获取用户信息
+    try {
+      // 检查 token 有效性 (已过期 | 被篡改)
+      Claims claims = this.jwtUtil.parseJWT(token, key);
 
-        // 获取JWT信息
-        String token = (String) authenticationToken.getCredentials();
-
-        // 获取对称加密密钥
-        if (!this.redisUtil.exists(token)) {
-            throw new AuthenticationException("token无效 (已过期 | 被篡改)");
-        }
-        Map<String, String> specKey = (Map<String, String>) this.redisUtil.get(token);
-        // 密钥encoded
-        byte[] encoded = Base64.decode(specKey.get("encoded"));
-        // 密钥算法
-        String algorithm = specKey.get("algorithm");
-        // 获取密钥
-        SecretKeySpec key = new SecretKeySpec(encoded, algorithm);
-
-        // 根据JWT获取用户信息
-        try {
-            // 检查 token 有效性 (已过期 | 被篡改)
-            Claims claims = this.jwtUtil.parseJWT(token, key);
-
-            return new SimpleAuthenticationInfo(claims.getAudience(), token, claims.getSubject());
-        } catch (Exception e) {
-            throw new AuthenticationException("token无效 (已过期 | 被篡改)");
-        }
+      return new SimpleAuthenticationInfo(claims.getAudience(), token, claims.getSubject());
+    } catch (Exception e) {
+      throw new AuthenticationException("token无效 (已过期 | 被篡改)");
     }
+  }
 
-    public void setJwtUtil(JwtUtil jwtUtil) {
-        this.jwtUtil = jwtUtil;
-    }
+  public void setJwtUtil(JwtUtil jwtUtil) {
+    this.jwtUtil = jwtUtil;
+  }
 
-    public void setRedisUtil(RedisUtil redisUtil) {
-        this.redisUtil = redisUtil;
-    }
+  public void setRedisUtil(RedisUtil redisUtil) {
+    this.redisUtil = redisUtil;
+  }
 }

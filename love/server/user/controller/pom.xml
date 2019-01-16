@@ -6,22 +6,23 @@
 
   <parent>
     <groupId>flcxi-love</groupId>
-    <artifactId>auth</artifactId>
+    <artifactId>user</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 
   <groupId>flcxi-love</groupId>
-  <artifactId>auth-controller</artifactId>
-  <version>${flcxi-love.auth.server.version}</version>
+  <artifactId>user-controller</artifactId>
+  <version>${flcxi-love.user.server.version}</version>
   <packaging>jar</packaging>
 
-  <name>auth-controller</name>
-  <description>auth server controller project for Spring Boot</description>
+  <name>user-controller</name>
+  <description>user server controller project for Spring Boot</description>
 
   <properties>
   </properties>
 
   <dependencies>
+
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
@@ -29,8 +30,8 @@
 
     <dependency>
       <groupId>flcxi-love</groupId>
-      <artifactId>auth-service</artifactId>
-      <version>${flcxi-love.auth.server.version}</version>
+      <artifactId>user-service</artifactId>
+      <version>${flcxi-love.user.server.version}</version>
     </dependency>
 
     <dependency>
@@ -38,6 +39,7 @@
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
+    
   </dependencies>
 
   <build>
@@ -48,6 +50,5 @@
       </plugin>
     </plugins>
   </build>
-
 
 </project>
