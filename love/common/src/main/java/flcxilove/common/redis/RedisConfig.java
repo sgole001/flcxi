@@ -1,5 +1,6 @@
-package flcxilove.auth.config.redis;
+package flcxilove.common.redis;
 
+import java.time.Duration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,9 +12,6 @@ import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
-
-import java.time.Duration;
-
 import redis.clients.jedis.JedisPoolConfig;
 
 @Configuration

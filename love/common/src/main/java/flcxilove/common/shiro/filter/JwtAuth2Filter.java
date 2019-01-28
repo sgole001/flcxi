@@ -1,5 +1,7 @@
 package flcxilove.common.shiro.filter;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.PathMatchingFilter;
@@ -19,44 +21,57 @@ import flcxilove.common.shiro.token.JwtAuthenticationToken;
  */
 public class JwtAuth2Filter extends PathMatchingFilter {
 
-    protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
+  /**
+   * 日志管理器
+   */
+  private Logger logger = LogManager.getLogger(JwtAuth2Filter.class.getName());
 
-        Subject subject = SecurityUtils.getSubject();
+  protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
 
-        // 从header中获取token
-        String jwt = ((HttpServletRequest) request).getHeader("jwt");
+    try {
 
-        // 认证Token对象
-        JwtAuthenticationToken token = new JwtAuthenticationToken(jwt);
-        // 当前用户对象登陆
-        SecurityUtils.getSubject().login(token);
+      // 从header中获取token
+      String jwt = ((HttpServletRequest) request).getHeader("jwt");
 
-        return Boolean.TRUE;
+      // 认证Token对象
+      JwtAuthenticationToken token = new JwtAuthenticationToken(jwt);
+      // 当前用户对象登陆
+      SecurityUtils.getSubject().login(token);
+
+      return Boolean.TRUE;
+
+    } catch (Exception e) {
+      logger.error(e.getCause().getMessage());
     }
 
-    protected boolean onAccessDenied(ServletRequest servletRequest, ServletResponse servletResponse) throws Exception {
+    return Boolean.FALSE;
+  }
 
-        Subject subject = SecurityUtils.getSubject();
+  protected boolean onAccessDenied(ServletRequest servletRequest, ServletResponse servletResponse) throws Exception {
 
-        // 未认证的情况
-        if (null == subject || !subject.isAuthenticated()) {
-            // 告知客户端JWT认证失败需跳转到登录页面
-            System.out.print("告知客户端JWT认证失败需跳转到登录页面");
-        } else {
-            //  已经认证但未授权的情况
-            // 告知客户端JWT没有权限访问此资源
-            System.out.print("告知客户端JWT没有权限访问此资源");
-        }
-        // 过滤链终止
-        return false;
+    Subject subject = SecurityUtils.getSubject();
+
+    // 未认证的情况
+    if (null == subject || !subject.isAuthenticated()) {
+      // 告知客户端JWT认证失败需跳转到登录页面
+      logger.info("告知客户端JWT认证失败需跳转到登录页面");
+    }
+    // 已经认证但未授权的情况
+    else {
+      // 告知客户端JWT没有权限访问此资源
+      logger.info("告知客户端JWT没有权限访问此资源");
     }
 
-    protected boolean onAccessDenied(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {
-        return this.onAccessDenied(request, response);
-    }
+    // 过滤链终止
+    return Boolean.FALSE;
+  }
 
-    @Override
-    public boolean onPreHandle(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {
-        return this.isAccessAllowed(request, response, mappedValue) || this.onAccessDenied(request, response, mappedValue);
-    }
+  protected boolean onAccessDenied(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {
+    return this.onAccessDenied(request, response);
+  }
+
+  @Override
+  public boolean onPreHandle(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {
+    return this.isAccessAllowed(request, response, mappedValue) || this.onAccessDenied(request, response, mappedValue);
+  }
 }

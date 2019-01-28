@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: user-service
+eureka:
+  instance:
+    home-page-url: http://localhost:${server.port}/${server.servlet.context-path}
+    metadata-map:
+      configPath: ${server.servlet.context-path}
+      management:
+        context-path: ${server.servlet.context-path}
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    service-url:
+      defaultZone: http://flcxipeer1:19090/eureka/,http://flcxipeer2:19091/eureka/

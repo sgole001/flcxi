@@ -1,19 +1,11 @@
-package flcxilove.user.config.shiro;
+package flcxilove.common.shiro;
 
-import flcxilove.common.shiro.filter.JwtAuth2Filter;
 import flcxilove.common.shiro.filter.JwtSubjectFactory;
-import flcxilove.common.shiro.realm.JwtRealm;
-import flcxilove.common.tools.JwtUtil;
-import flcxilove.common.tools.RedisUtil;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import javax.annotation.Resource;
-import javax.servlet.Filter;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.realm.Realm;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.springframework.context.annotation.Bean;
@@ -22,11 +14,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ShiroConfig {
 
-  @Resource
-  private JwtUtil jwtUtil;
-
-  @Resource
-  private RedisUtil redisUtil;
+  @Resource(name = "shiroBuilder")
+  private ShiroBuilder shiroBuilder;
 
   /**
    * 配置shiro过滤器
@@ -43,9 +32,9 @@ public class ShiroConfig {
     // 2.设置securityManager
     shiroFilterFactoryBean.setSecurityManager(securityManager);
     // 3.拦截器配置
-    shiroFilterFactoryBean.setFilters(this.buildFilters());
+    shiroFilterFactoryBean.setFilters(shiroBuilder.buildFilters());
     // 4.拦截规则配置
-    shiroFilterFactoryBean.setFilterChainDefinitionMap(this.buildFilterChain());
+    shiroFilterFactoryBean.setFilterChainDefinitionMap(shiroBuilder.buildFilterChain());
 
     return shiroFilterFactoryBean;
   }
@@ -63,55 +52,10 @@ public class ShiroConfig {
     DefaultSubjectDAO subjectDAO = (DefaultSubjectDAO) securityManager.getSubjectDAO();
     DefaultSessionStorageEvaluator evaluator = (DefaultSessionStorageEvaluator) subjectDAO.getSessionStorageEvaluator();
     securityManager.setSubjectFactory(new JwtSubjectFactory(evaluator));
-    securityManager.setRealm(this.buildRealm());
+    securityManager.setRealm(shiroBuilder.buildRealm());
 
     SecurityUtils.setSecurityManager(securityManager);
 
     return securityManager;
-  }
-
-  /**
-   * 构建ShiroRealm
-   *
-   * @return ShiroRealm
-   */
-  private Realm buildRealm() {
-
-    // JWT
-    JwtRealm jwtRealm = new JwtRealm();
-    jwtRealm.setRedisUtil(this.redisUtil);
-    jwtRealm.setJwtUtil(this.jwtUtil);
-
-    return jwtRealm;
-  }
-
-  /**
-   * 构建Shiro过滤器
-   *
-   * @return Shiro过滤器
-   */
-  private Map<String, Filter> buildFilters() {
-
-    Map<String, Filter> filters = new LinkedHashMap<>();
-    // JWT认证过滤器
-    JwtAuth2Filter jwtAuth2Filter = new JwtAuth2Filter();
-
-    filters.put("jwt", jwtAuth2Filter);
-
-    return filters;
-  }
-
-  /**
-   * 构建Shiro过滤链
-   *
-   * @return Shiro过滤链
-   */
-  private Map<String, String> buildFilterChain() {
-
-    Map<String, String> filterChain = new LinkedHashMap<>();
-
-    filterChain.putIfAbsent("/users/**", "jwt");
-
-    return filterChain;
   }
 }

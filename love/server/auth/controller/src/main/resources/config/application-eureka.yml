@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: auth-service
+eureka:
+  client:
+    service-url:
+      defaultZone: http://flcxipeer1:19090/eureka/,http://flcxipeer2:19091/eureka/

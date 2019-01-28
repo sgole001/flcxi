@@ -1,5 +1,6 @@
 package flcxilove.auth.api.rest;
 
+import flcxilove.common.api.RestApi;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -15,7 +16,7 @@ import flcxilove.auth.api.response.data.FetchTokenData;
  * @since: 2018/11/7
  * @version: 1.0
  */
-public interface AuthRest {
+public interface AuthRest extends RestApi {
 
     /**
      * 获取JWT

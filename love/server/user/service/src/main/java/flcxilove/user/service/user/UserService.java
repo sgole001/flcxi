@@ -1,5 +1,6 @@
 package flcxilove.user.service.user;
 
+import flcxilove.user.api.request.CreateUsersRequestMessage;
 import flcxilove.user.api.response.data.UserData;
 
 /**
@@ -19,4 +20,13 @@ public interface UserService {
    * @return 用户信息
    */
   UserData searchUserInfo(final String uid);
+
+  /**
+   * 创建用户信息
+   *
+   * @param requestMessage 创建用用户信息
+   *
+   * @return 创建后用户信息
+   */
+  UserData createUser(final CreateUsersRequestMessage requestMessage);
 }

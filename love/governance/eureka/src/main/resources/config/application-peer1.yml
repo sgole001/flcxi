@@ -1,0 +1,14 @@
+server:
+  port: 19090
+spring:
+  application:
+    name: governance-eureka1
+
+eureka:
+  instance:
+    hostname: flcxipeer1
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+    service-url:
+      defaultZone: http://flcxipeer2:19091/eureka/

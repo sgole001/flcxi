@@ -19,13 +19,10 @@
   <description>auth server controller project for Spring Boot</description>
 
   <properties>
+    <flcxi-love.user.server.version>0.0.1-SNAPSHOT</flcxi-love.user.server.version>
   </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
 
     <dependency>
       <groupId>flcxi-love</groupId>
@@ -34,10 +31,16 @@
     </dependency>
 
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
-      <scope>test</scope>
+      <groupId>flcxi-love</groupId>
+      <artifactId>user-api</artifactId>
+      <version>${flcxi-love.user.server.version}</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+    </dependency>
+
   </dependencies>
 
   <build>

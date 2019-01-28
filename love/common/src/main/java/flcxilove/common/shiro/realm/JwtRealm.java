@@ -1,5 +1,7 @@
 package flcxilove.common.shiro.realm;
 
+import flcxilove.common.constant.CommonMessageConstant;
+import flcxilove.common.exception.SystemException;
 import flcxilove.common.shiro.token.JwtAuthenticationToken;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -71,7 +73,7 @@ public class JwtRealm extends AuthorizingRealm {
 
     // 获取对称加密密钥
     if (!this.redisUtil.exists(token)) {
-      throw new AuthenticationException("token无效 (已过期 | 被篡改)");
+      throw new AuthenticationException(new SystemException(CommonMessageConstant.MSG_COM_00000));
     }
     Map<String, String> specKey = (Map<String, String>) this.redisUtil.get(token);
     // 密钥encoded
@@ -88,7 +90,7 @@ public class JwtRealm extends AuthorizingRealm {
 
       return new SimpleAuthenticationInfo(claims.getAudience(), token, claims.getSubject());
     } catch (Exception e) {
-      throw new AuthenticationException("token无效 (已过期 | 被篡改)");
+      throw new AuthenticationException(new SystemException(CommonMessageConstant.MSG_COM_00000));
     }
   }
 

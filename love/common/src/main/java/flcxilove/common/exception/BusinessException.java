@@ -9,29 +9,23 @@ package flcxilove.common.exception;
  */
 public class BusinessException extends BaseException {
 
-    public BusinessException(String errorCode, Object[] params) {
-        super(errorCode, params);
-    }
+  public BusinessException(String errorCode, Object[] params) {
+    super(errorCode, params);
+  }
 
-    public BusinessException(String errorCode, Object[] params, Throwable cause) {
-        super(errorCode, params, cause);
-    }
+  public BusinessException(String errorCode, Object[] params, Throwable cause) {
+    super(errorCode, params, cause);
+  }
 
-    public BusinessException(String errorCode, Throwable cause) {
-        super(errorCode, cause);
-    }
+  public BusinessException(String errorCode, Throwable cause) {
+    super(errorCode, cause);
+  }
 
-    public BusinessException(String errorCode) {
-        super(errorCode);
-    }
+  public BusinessException(String errorCode) {
+    super(errorCode);
+  }
 
-    public BusinessException(Throwable cause) {
-        super(cause);
-    }
-
-    @Override
-    public String getMessage() {
-
-        return super.getMessage("/i18n/business/messages");
-    }
+  public BusinessException(Throwable cause) {
+    super(cause);
+  }
 }

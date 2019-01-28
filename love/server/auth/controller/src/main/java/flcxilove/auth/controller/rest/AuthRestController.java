@@ -1,51 +1,57 @@
 package flcxilove.auth.controller.rest;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.annotation.Resource;
-
 import flcxilove.auth.api.request.FetchTokenRequestMessage;
 import flcxilove.auth.api.response.FetchTokenResponseMessage;
 import flcxilove.auth.api.response.data.FetchTokenData;
 import flcxilove.auth.api.rest.AuthRest;
-import flcxilove.auth.config.message.MessageConstant;
 import flcxilove.auth.service.token.JwtService;
 import flcxilove.common.controller.RestApiController;
-import flcxilove.common.exception.BaseException;
+import flcxilove.common.feign.FeignClientBuilder;
+import flcxilove.user.api.request.CreateUsersRequestMessage;
+import flcxilove.user.api.rest.UserRest;
+import javax.annotation.Resource;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class AuthRestController extends RestApiController implements AuthRest {
 
-    @Resource(name = "jwtService")
-    private JwtService jwtService;
+  @Resource(name = "jwtService")
+  private JwtService jwtService;
 
-    @Override
-    public FetchTokenResponseMessage<FetchTokenData> accessTokenV101(FetchTokenRequestMessage requestMessage) throws Exception {
+  @Resource(name = "feignClientBuilder")
+  private FeignClientBuilder feignClientBuilder;
 
-        try {
+  /**
+   * 日志管理器
+   */
+  private Logger logger = LogManager.getLogger(AuthRestController.class.getName());
 
-            // 根据请求方信息生成JWT
-            FetchTokenData tokenData = jwtService.generateJwt(requestMessage);
+  @Override
+  public FetchTokenResponseMessage<FetchTokenData> accessTokenV101(FetchTokenRequestMessage requestMessage) throws Exception {
 
-            return super.processResult(HttpStatus.OK, MessageConstant.MSG_SYS_00000, null, FetchTokenResponseMessage.class, tokenData);
+    // 根据请求方信息生成JWT
+    FetchTokenData tokenData = jwtService.generateJwt(requestMessage);
 
-        } catch (BaseException e) {
-            return super.processResult(HttpStatus.INTERNAL_SERVER_ERROR, e, FetchTokenResponseMessage.class);
-        }
-    }
+    // 创建用户
+    CreateUsersRequestMessage createUsersRequestMessage = new CreateUsersRequestMessage();
+    createUsersRequestMessage.setUid(requestMessage.getClientId());
+    createUsersRequestMessage.setName("sgole");
+    createUsersRequestMessage.setAge(35);
+    createUsersRequestMessage.setGender("Male");
+    UserRest userRest = this.feignClientBuilder.build(UserRest.class, "user-service");
+    userRest.createUsersV101(createUsersRequestMessage);
 
-    @Override
-    public FetchTokenResponseMessage<FetchTokenData> accessTokenV102(FetchTokenRequestMessage requestMessage) throws Exception {
-        try {
+    return super.processResult(FetchTokenResponseMessage.class, tokenData);
+  }
 
-            // 根据请求方信息生成JWT
-            FetchTokenData tokenData = jwtService.generateJwt(requestMessage);
+  @Override
+  public FetchTokenResponseMessage<FetchTokenData> accessTokenV102(FetchTokenRequestMessage requestMessage) throws Exception {
 
-            return super.processResult(HttpStatus.OK, MessageConstant.MSG_SYS_00001, null, FetchTokenResponseMessage.class, tokenData);
+    // 根据请求方信息生成JWT
+    FetchTokenData tokenData = jwtService.generateJwt(requestMessage);
 
-        } catch (BaseException e) {
-            return super.processResult(HttpStatus.INTERNAL_SERVER_ERROR, e, FetchTokenResponseMessage.class);
-        }
-    }
+    return super.processResult(FetchTokenResponseMessage.class, tokenData);
+  }
 }
