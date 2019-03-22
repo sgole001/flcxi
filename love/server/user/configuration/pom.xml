@@ -23,7 +23,11 @@
   </properties>
 
   <dependencies>
-
+    <dependency>
+      <groupId>flcxi-love</groupId>
+      <artifactId>governance-shiro</artifactId>
+      <version>${flcxi-love.governance.server.version}</version>
+    </dependency>
   </dependencies>
 
   <build>

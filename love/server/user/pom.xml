@@ -31,6 +31,7 @@
   <properties>
     <flcxi-love.user.server.version>0.0.1-SNAPSHOT</flcxi-love.user.server.version>
     <flcxi-love.common.version>0.0.1-SNAPSHOT</flcxi-love.common.version>
+    <flcxi-love.governance.server.version>0.0.1-SNAPSHOT</flcxi-love.governance.server.version>
   </properties>
 
   <dependencies>

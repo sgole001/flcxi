@@ -13,7 +13,7 @@
   <groupId>flcxi-love</groupId>
   <artifactId>governance-eureka</artifactId>
   <version>${flcxi-love.governance.server.version}</version>
-  <packaging>jar</packaging>
+  <packaging>war</packaging>
 
   <name>governance-eureka</name>
   <description>eureka - Service Discovery project for Spring Boot</description>
@@ -32,6 +32,13 @@
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <failOnMissingWebXml>false</failOnMissingWebXml>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>

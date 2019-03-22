@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>flcxi-love</groupId>
+    <artifactId>governance</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+
+  <groupId>flcxi-love</groupId>
+  <artifactId>governance-druid</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+
+  <name>governance-druid</name>
+  <description>Druid - DataSource Pool project for Spring Boot</description>
+
+  <properties>
+  </properties>
+
+  <dependencies>
+    <!-- 线程池工具组件Druid -->
+    <dependency>
+      <groupId>com.alibaba</groupId>
+      <artifactId>druid-spring-boot-starter</artifactId>
+    </dependency>
+    <!-- MySql连接工具组件 -->
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

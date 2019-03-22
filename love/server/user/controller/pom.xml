@@ -13,7 +13,7 @@
   <groupId>flcxi-love</groupId>
   <artifactId>user-controller</artifactId>
   <version>${flcxi-love.user.server.version}</version>
-  <packaging>jar</packaging>
+  <packaging>war</packaging>
 
   <name>user-controller</name>
   <description>user server controller project for Spring Boot</description>
@@ -38,6 +38,13 @@
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <failOnMissingWebXml>false</failOnMissingWebXml>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>

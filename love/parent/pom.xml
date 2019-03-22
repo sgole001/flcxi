@@ -30,6 +30,9 @@
         <shiro.version>1.4.0</shiro.version>
         <jaxb.version>2.3.1</jaxb.version>
         <feign.jackson.version>8.18.0</feign.jackson.version>
+        <druid.spring.boot.version>1.1.14</druid.spring.boot.version>
+        <mysql.version>8.0.15</mysql.version>
+        <mybatis.spring.boot.version>2.0.0</mybatis.spring.boot.version>
     </properties>
 
     <dependencyManagement>
@@ -112,6 +115,27 @@
                 <groupId>com.netflix.feign</groupId>
                 <artifactId>feign-jackson</artifactId>
                 <version>${feign.jackson.version}</version>
+            </dependency>
+
+            <!-- 线程池工具组件druid -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid-spring-boot-starter</artifactId>
+                <version>${druid.spring.boot.version}</version>
+            </dependency>
+
+            <!-- MySql连接工具 -->
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql.version}</version>
+            </dependency>
+
+            <!-- MyBatis工具组件 -->
+            <dependency>
+                <groupId>org.mybatis.spring.boot</groupId>
+                <artifactId>mybatis-spring-boot-starter</artifactId>
+                <version>${mybatis.spring.boot.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

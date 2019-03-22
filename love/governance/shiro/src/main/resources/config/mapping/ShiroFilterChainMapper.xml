@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="flcxilove.governance.shiro.dao.mapper.ShiroFilterChainMapper">
+
+  <select id="selectShiroFilterChain" resultType="flcxilove.governance.shiro.dao.entity.ShiroFilterChain">
+    SELECT
+       itf.uri as target
+      ,opt.ocode as filters
+    FROM
+      Interface itf
+      JOIN InterfaceAndPrivilegeRel iprel on itf.iid = iprel.iid
+      JOIN Privilege plg on iprel.pid = plg.pid
+      JOIN PrivilegeAndOperationRel porel on plg.pid = porel.pid
+      JOIN Operation opt on porel.oid = opt.oid
+    WHERE
+      itf.enabled = 1
+      AND
+      plg.enabled = 1
+      AND
+      opt.enabled = 1
+  </select>
+</mapper>

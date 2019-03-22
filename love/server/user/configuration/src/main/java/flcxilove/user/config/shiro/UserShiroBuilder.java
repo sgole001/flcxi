@@ -1,55 +1,52 @@
 package flcxilove.user.config.shiro;
 
-import flcxilove.common.shiro.ShiroBuilder;
-import flcxilove.common.shiro.filter.JwtAuth2Filter;
-import flcxilove.common.shiro.realm.JwtRealm;
-import flcxilove.common.tools.JwtUtil;
-import flcxilove.common.tools.RedisUtil;
+import flcxilove.governance.shiro.builder.impl.AbstractShiroBuilder;
+import flcxilove.governance.shiro.dao.entity.ShiroFilterChain;
+import flcxilove.governance.shiro.service.ShiroService;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.Resource;
-import javax.servlet.Filter;
-import org.apache.shiro.realm.Realm;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
+/**
+ * 用户服务Shiro构建器
+ *
+ * @author sgole
+ * @version v1.0
+ * @since 2019-03-18 13:53
+ */
 @Component(value = "shiroBuilder")
-public class UserShiroBuilder implements ShiroBuilder {
+@DependsOn("message")
+public class UserShiroBuilder extends AbstractShiroBuilder {
 
   @Resource
-  private JwtUtil jwtUtil;
+  private ShiroService shiroService;
 
-  @Resource
-  private RedisUtil redisUtil;
-
-  @Override
-  public Realm buildRealm() {
-
-    // JWT
-    JwtRealm jwtRealm = new JwtRealm();
-    jwtRealm.setRedisUtil(this.redisUtil);
-    jwtRealm.setJwtUtil(this.jwtUtil);
-
-    return jwtRealm;
-  }
-
-  @Override
-  public Map<String, Filter> buildFilters() {
-
-    Map<String, Filter> filters = new LinkedHashMap<>();
-    // JWT认证过滤器
-    JwtAuth2Filter jwtAuth2Filter = new JwtAuth2Filter();
-
-    filters.put("jwt", jwtAuth2Filter);
-
-    return filters;
-  }
+  /**
+   * 日志管理器
+   */
+  private Logger logger = LogManager.getLogger(UserShiroBuilder.class.getName());
 
   @Override
   public Map<String, String> buildFilterChain() {
 
+    // 过滤对象链集合映射
     Map<String, String> filterChain = new LinkedHashMap<>();
 
-    filterChain.putIfAbsent("/users/**", "jwt");
+    // 查询Shiro过滤规则信息
+    List<ShiroFilterChain> shiroFilterChains = shiroService.findShiroFilterChain();
+
+    if (shiroFilterChains != null) {
+
+      // 构建过滤对象链集合映射
+      for (ShiroFilterChain shiroFilterChain : shiroFilterChains) {
+        filterChain.putIfAbsent(shiroFilterChain.getTarget(), shiroFilterChain.getFilters());
+      }
+    }
 
     return filterChain;
   }

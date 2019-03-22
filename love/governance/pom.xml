@@ -21,7 +21,11 @@
 
   <!--聚合子模块-->
   <modules>
+    <module>druid</module>
     <module>eureka</module>
+    <module>mybatis</module>
+    <module>redis</module>
+    <module>shiro</module>
   </modules>
 
   <properties>

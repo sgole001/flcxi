@@ -13,7 +13,7 @@
   <groupId>flcxi-love</groupId>
   <artifactId>auth-controller</artifactId>
   <version>${flcxi-love.auth.server.version}</version>
-  <packaging>jar</packaging>
+  <packaging>war</packaging>
 
   <name>auth-controller</name>
   <description>auth server controller project for Spring Boot</description>
@@ -45,6 +45,13 @@
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <failOnMissingWebXml>false</failOnMissingWebXml>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>

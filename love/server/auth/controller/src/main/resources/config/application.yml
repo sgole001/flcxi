@@ -1,10 +1,3 @@
 spring:
   profiles:
     active: server,eureka
-#logging:
-#  config: classpath:config/logger/log4j2.xml
-#management:
-#  endpoints:
-#    web:
-#      exposure:
-#        include: "*"
