@@ -9,12 +9,12 @@ package flcxilove.common.exception;
  */
 public class DBException extends BaseException {
 
-  public DBException(String errorCode, Object[] params) {
+  public DBException(String errorCode, Object... params) {
     super(errorCode, params);
   }
 
-  public DBException(String errorCode, Object[] params, Throwable cause) {
-    super(errorCode, params, cause);
+  public DBException(String errorCode, Throwable cause, Object... params) {
+    super(errorCode, cause, params);
   }
 
   public DBException(String errorCode, Throwable cause) {

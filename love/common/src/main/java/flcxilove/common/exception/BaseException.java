@@ -2,6 +2,13 @@ package flcxilove.common.exception;
 
 import flcxilove.common.tools.MessageUtil;
 
+/**
+ * 异常类基类
+ *
+ * @author sgole
+ * @version v1.0
+ * @since 2019-04-15 21:18
+ */
 public class BaseException extends RuntimeException {
 
   /**
@@ -14,13 +21,13 @@ public class BaseException extends RuntimeException {
    */
   protected Object[] params;
 
-  public BaseException(String errorCode, Object[] params) {
+  public BaseException(String errorCode, Object... params) {
     super("");
     this.errorCode = errorCode;
     this.params = params;
   }
 
-  public BaseException(String errorCode, Object[] params, Throwable cause) {
+  public BaseException(String errorCode, Throwable cause, Object... params) {
     super(cause);
     this.errorCode = errorCode;
     this.params = params;

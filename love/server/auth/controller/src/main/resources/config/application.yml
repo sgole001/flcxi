@@ -1,3 +1,3 @@
 spring:
   profiles:
-    active: server,eureka
+    active: server,eureke,redis,token

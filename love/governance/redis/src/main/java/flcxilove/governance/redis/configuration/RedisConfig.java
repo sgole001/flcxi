@@ -1,16 +1,21 @@
 package flcxilove.governance.redis.configuration;
 
+import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
+import flcxilove.governance.redis.builder.RedisCacheConfigBuilder;
 import java.time.Duration;
+import javax.annotation.Resource;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.cache.RedisCacheWriter;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import redis.clients.jedis.JedisPoolConfig;
 
 /**
@@ -61,6 +66,9 @@ public class RedisConfig {
 
   @Value("${spring.redis.testWhileIdle:true}")
   private Boolean testWhileIdle;
+
+  @Resource(name = "cacheConfigBuilder")
+  private RedisCacheConfigBuilder cacheConfigBuilder;
 
   @Bean
   public JedisPoolConfig jedisPoolConfig() {
@@ -115,16 +123,25 @@ public class RedisConfig {
   }
 
   @Bean
+  public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
+    return new RedisCacheManager(RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory),
+        // 默认缓存策略
+        cacheConfigBuilder.buildDefaultCacheConfiguration(),
+        // 初始化缓存策略集合
+        cacheConfigBuilder.buildInitialCacheConfigurations());
+  }
+
+  @Bean
   public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
 
     // 使用jackson序列化替代jdk序列化
-    Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
+    FastJsonRedisSerializer redisSerializer = new FastJsonRedisSerializer<>(Object.class);
     RedisTemplate<String, Object> template = new RedisTemplate<>();
     template.setConnectionFactory(redisConnectionFactory);
-    template.setKeySerializer(jackson2JsonRedisSerializer);
-    template.setValueSerializer(jackson2JsonRedisSerializer);
-    template.setHashKeySerializer(jackson2JsonRedisSerializer);
-    template.setHashValueSerializer(jackson2JsonRedisSerializer);
+    template.setKeySerializer(redisSerializer);
+    template.setValueSerializer(redisSerializer);
+    template.setHashKeySerializer(redisSerializer);
+    template.setHashValueSerializer(redisSerializer);
     template.afterPropertiesSet();
 
     return template;

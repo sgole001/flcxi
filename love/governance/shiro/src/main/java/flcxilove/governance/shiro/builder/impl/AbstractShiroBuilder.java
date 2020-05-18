@@ -1,7 +1,11 @@
 package flcxilove.governance.shiro.builder.impl;
 
 import flcxilove.governance.shiro.builder.ShiroBuilder;
+import flcxilove.governance.shiro.filter.AllRolesAuthorizationFilter;
+import flcxilove.governance.shiro.filter.AnonymousFilter;
 import flcxilove.governance.shiro.filter.JwtAuth2Filter;
+import flcxilove.governance.shiro.filter.PermissionsAuthorizationFilter;
+import flcxilove.governance.shiro.filter.RolesAuthorizationFilter;
 import flcxilove.governance.shiro.realm.JwtRealm;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -89,8 +93,16 @@ public abstract class AbstractShiroBuilder implements ShiroBuilder {
 
     // 过滤器集合映射
     Map<String, Filter> filters = new LinkedHashMap<>();
+    // 自定义匿名过滤器
+    filters.put(AnonymousFilter.FILTER_ALIAS, new AnonymousFilter());
+    // 自定义角色过滤器(部分满足)
+    filters.put(RolesAuthorizationFilter.FILTER_ALIAS, new RolesAuthorizationFilter());
+    // 自定义角色过滤器(全部满足)
+    filters.put(AllRolesAuthorizationFilter.FILTER_ALIAS, new AllRolesAuthorizationFilter());
+    // 自定义权限过滤器(全部满足)
+    filters.put(PermissionsAuthorizationFilter.FILTER_ALIAS, new PermissionsAuthorizationFilter());
     // JWT过滤器
-    filters.put(JwtAuth2Filter.FILTER_CODE, new JwtAuth2Filter());
+    filters.put(JwtAuth2Filter.FILTER_ALIAS, new JwtAuth2Filter());
 
     return filters;
   }

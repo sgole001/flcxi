@@ -1,12 +1,11 @@
 package flcxilove.common.exception;
 
 import flcxilove.common.constant.CommonMessageConstant;
-import flcxilove.common.messages.RestApiMessage;
-import javax.annotation.Resource;
+import flcxilove.common.api.RestResponseMessage;
+import flcxilove.common.tools.MessageUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,10 +19,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @since 2019-01-25 17:16
  */
 @ControllerAdvice
+@DependsOn("message")
 public class CommonExceptionHandler {
-
-  @Resource
-  private MessageSource messageSource;
 
   /**
    * 日志管理器
@@ -32,10 +29,10 @@ public class CommonExceptionHandler {
 
   @ExceptionHandler(Exception.class)
   @ResponseBody
-  public RestApiMessage handle(Exception e) {
+  public RestResponseMessage handle(Exception e) {
 
     // 响应消息实例
-    RestApiMessage message = new RestApiMessage();
+    RestResponseMessage message = new RestResponseMessage();
 
     if (e instanceof BaseException) {
 
@@ -64,7 +61,7 @@ public class CommonExceptionHandler {
       // 异常错误码
       message.setStatus(CommonMessageConstant.MSG_COM_00001);
       // 异常信息
-      message.setMessage(messageSource.getMessage(CommonMessageConstant.MSG_COM_00001, null, LocaleContextHolder.getLocale()));
+      message.setMessage(MessageUtil.accessor.getMessage(CommonMessageConstant.MSG_COM_00001));
       // HTTP状态码
       message.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR.toString());
 

@@ -9,4 +9,13 @@ package flcxilove.governance.shiro.constant;
  */
 public interface ShiroConstant extends ShiroMessageConstant {
 
+  /**
+   * JWT认证HTTP头部属性名
+   */
+  String JWT_AUTH_HTTP_HEAD = "jwt";
+
+  /**
+   * Shiro针对Restful拦截过滤链分割符（URI|||Rest Method eg:/users|||Post）
+   */
+  String REST_CHAIN_PATTERN_SEPARATOR = "\\|\\|\\|";
 }

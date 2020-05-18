@@ -9,12 +9,12 @@ package flcxilove.common.exception;
  */
 public class SystemException extends BaseException {
 
-  public SystemException(String errorCode, Object[] params) {
+  public SystemException(String errorCode, Object... params) {
     super(errorCode, params);
   }
 
-  public SystemException(String errorCode, Object[] params, Throwable cause) {
-    super(errorCode, params, cause);
+  public SystemException(String errorCode, Throwable cause, Object... params) {
+    super(errorCode, cause, params);
   }
 
   public SystemException(String errorCode, Throwable cause) {

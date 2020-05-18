@@ -1,23 +1,24 @@
 package flcxilove.auth.service.token.impl;
 
-import org.apache.commons.lang3.time.DateUtils;
-import org.springframework.stereotype.Service;
-
-import java.util.Date;
-import java.util.UUID;
-
-import javax.annotation.Resource;
-import javax.crypto.spec.SecretKeySpec;
-
-import flcxilove.auth.api.request.FetchTokenRequestMessage;
-import flcxilove.auth.api.response.data.FetchTokenData;
+import flcxilove.auth.api.v1.response.data.TokenData;
 import flcxilove.auth.config.message.MessageConstant;
 import flcxilove.auth.dao.redis.token.JwtDao;
+import flcxilove.auth.service.dto.AuthDto;
 import flcxilove.auth.service.token.JwtService;
-import flcxilove.common.beans.JwtBean;
+import flcxilove.common.beans.JwtPayload;
 import flcxilove.common.exception.BusinessException;
 import flcxilove.common.tools.CryptoUtil;
 import flcxilove.common.tools.JwtUtil;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import javax.annotation.Resource;
+import javax.crypto.spec.SecretKeySpec;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 /**
  * JWT算法逻辑服务实现类
@@ -38,76 +39,103 @@ public class DefaultJwtService implements JwtService {
   @Resource
   private JwtDao jwtDao;
 
-  @Override
-  public FetchTokenData generateJwt(FetchTokenRequestMessage requestMessage) {
+  @Resource(name = "accessTokenPayload")
+  private JwtPayload accessTokenPayload;
 
-    // 消息主体：获取JWT
-    FetchTokenData tokenData = new FetchTokenData();
+  @Resource(name = "refreshTokenPayload")
+  private JwtPayload refreshTokenPayload;
+
+  @Override
+  public TokenData applyToken(AuthDto authDto) {
+
+    // 申请令牌信息
+    TokenData tokenData = new TokenData();
+
+    // 生成资源访问令牌JWT
+    tokenData.setAccessToken(this.generateAccessToken(authDto));
+    // 生成刷新资源访问令牌用令牌JWT
+    tokenData.setRefreshToken(this.generateRefreshToken(authDto));
+
+    return tokenData;
+  }
+
+  @Override
+  public String generateAccessToken(AuthDto authDto) {
 
     try {
-
+      // 构建JWT负载动态信息和自定义信息
+      this.buildDynamicJwyPayLoad(authDto, this.accessTokenPayload);
       // 生成对称密钥
-      SecretKeySpec keySpec = cryptoUtil.generateKey(requestMessage.getSecretKey());
+      SecretKeySpec keySpec = cryptoUtil.generateKey(authDto.getSecretKey());
 
-      // 生成JWT
-      String jwt = jwtUtil.createJWT(this.buildJwtBean(requestMessage), keySpec);
+      // 创建资源访问令牌JWT
+      String accessToken = jwtUtil.createJWT(this.accessTokenPayload, keySpec);
 
       // 持久化JWT
-      jwtDao.saveJwt(jwt, keySpec);
+      jwtDao.saveJwt(accessToken, keySpec, this.accessTokenPayload.getExp(), TimeUnit.MILLISECONDS);
 
-      // 构建消息主体：获取JWT
-      return this.buildTokenData(jwt);
+      return accessToken;
 
     } catch (Exception e) {
       throw new BusinessException(MessageConstant.MSG_BIZ_00001, e);
     }
   }
 
-  /**
-   * 构建消息主体：获取JWT
-   *
-   * @param jwt JWT
-   *
-   * @return 消息主体：获取JWT
-   */
-  private FetchTokenData buildTokenData(String jwt) {
+  @Override
+  public String generateRefreshToken(AuthDto authDto) {
 
-    // 消息主体：获取JWT
-    FetchTokenData tokenData = new FetchTokenData();
+    try {
+      // 构建JWT负载动态信息和自定义信息
+      this.buildDynamicJwyPayLoad(authDto, this.refreshTokenPayload);
+      // 生成对称密钥
+      SecretKeySpec keySpec = cryptoUtil.generateKey(authDto.getSecretKey());
 
-    // JWT
-    tokenData.setJwt(jwt);
+      // 创建刷新资源访问令牌的令牌JWT
+      String refreshToken = jwtUtil.createJWT(this.refreshTokenPayload, keySpec);
 
-    return tokenData;
+      // 持久化JWT
+      jwtDao.saveJwt(refreshToken, keySpec, this.refreshTokenPayload.getExp(), TimeUnit.MILLISECONDS);
+
+      return refreshToken;
+
+    } catch (Exception e) {
+      throw new BusinessException(MessageConstant.MSG_BIZ_00001, e);
+    }
+  }
+
+  @Override
+  public String refreshAccessToken(String refreshToken) {
+    return null;
   }
 
   /**
-   * 构建JWT信息Bean
+   * 构建JWT负载动态信息和自定义信息
    *
-   * @param requestMessage API请求信息
-   *
-   * @return JWT信息Bean
+   * @param authDto 令牌申请数据DTO
+   * @param jwtPayload JWT负载
    */
-  private JwtBean buildJwtBean(FetchTokenRequestMessage requestMessage) {
+  private void buildDynamicJwyPayLoad(AuthDto authDto, JwtPayload jwtPayload) {
 
-    // JWT信息Bean
-    JwtBean jwtBean = new JwtBean();
-
-    // JWT签发者
-    jwtBean.setIss("msscn");
+    // 构建JWT负载动态信息和自定义信息
     // JWT所面向的用户
-    jwtBean.setSub("获取登陆令牌");
+    jwtPayload.setSub(authDto.getUid());
     // 接收JWT的一方
-    jwtBean.setAud(requestMessage.getClientId());
-    // JWT的过期时间，这个过期时间必须要大于签发时间
-    jwtBean.setExp(DateUtils.addDays(new Date(), 7));
-    // 定义在什么时间之前，该JWT都是不可用的
-    jwtBean.setNbf(DateUtils.addDays(new Date(), -7));
+    jwtPayload.setAud(authDto.getSource());
     // JWT的签发时间
-    jwtBean.setIat(new Date());
+    if (jwtPayload.getIat() == null) {
+      jwtPayload.setIat(new Date());
+    }
     // JWT的唯一身份标识(主要用来作为一次性token,从而回避重放攻击)
-    jwtBean.setId(UUID.randomUUID().toString());
+    if (StringUtils.isBlank(jwtPayload.getId())) {
+      jwtPayload.setId(UUID.randomUUID().toString());
+    }
 
-    return jwtBean;
+    // 自定义信息
+    Map<String, Object> customClaims = new HashMap<>(1);
+    // 用户角色
+    if (!CollectionUtils.isEmpty(authDto.getRoles())) {
+      customClaims.put("sub-role", authDto.getRoles());
+    }
+    jwtPayload.setCustomClaims(customClaims);
   }
 }

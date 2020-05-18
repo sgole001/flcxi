@@ -9,7 +9,6 @@ import java.util.Map;
 import javax.annotation.Resource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Component;
  * @since 2019-03-18 13:53
  */
 @Component(value = "shiroBuilder")
-@DependsOn("message")
 public class UserShiroBuilder extends AbstractShiroBuilder {
 
   @Resource

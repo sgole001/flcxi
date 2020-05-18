@@ -1,6 +1,6 @@
 package flcxilove.common.controller;
 
-import flcxilove.common.messages.RestApiMessage;
+import flcxilove.common.api.RestResponseMessage;
 import org.springframework.http.HttpStatus;
 
 /**
@@ -17,7 +17,7 @@ public class RestApiController {
    *
    * @return 响应数据接口
    */
-  protected <E, T extends RestApiMessage<E>> T processResult(final Class<T> rescls, E data) throws Exception {
+  protected <E, T extends RestResponseMessage<E>> T processResult(final Class<T> rescls, E data) throws Exception {
 
     // 响应数据接口
 //            final T responseDate = rescls.newInstance(); // JDK9以后被废弃

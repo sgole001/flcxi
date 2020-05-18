@@ -97,7 +97,7 @@ public class CryptoUtil {
 
     byte[] encrypted = cipher.doFinal(target.getBytes(encodingFormat));
     // 此处使用BASE64做转码。
-    return decryptBASE64(encrypted);
+    return encryptBASE64(encrypted);
   }
 
   /**
@@ -174,7 +174,7 @@ public class CryptoUtil {
    *
    * @return 对称加密密钥摘要
    */
-  private byte[] digestKey(String key) {
+  public byte[] digestKey(String key) {
     try {
       // 创建消息摘要算法
       MessageDigest digester = MessageDigest.getInstance(this.cryptoBean.getDigest());

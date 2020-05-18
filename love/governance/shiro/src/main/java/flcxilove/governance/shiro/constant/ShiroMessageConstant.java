@@ -10,14 +10,9 @@ package flcxilove.governance.shiro.constant;
 public interface ShiroMessageConstant {
 
   /**
-   * {0}服务开始。
+   * 系统认证用户失败。
    */
   String MSG_SHIRO_SYS_00000 = "MSG_SHIRO_SYS_00000";
-
-  /**
-   * {0}服务结束。
-   */
-  String MSG_SHIRO_SYS_00001 = "MSG_SHIRO_SYS_00001";
 
   /**
    * 系统未配置Shiro过滤规则。

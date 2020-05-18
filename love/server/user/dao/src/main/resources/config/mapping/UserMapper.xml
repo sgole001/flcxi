@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="flcxilove.user.dao.mapper.UserMapper">
+
+  <resultMap id="selectUserResultMap" type="flcxilove.user.dao.bo.UserBo">
+    <id property="account.id" column="aid"/>
+    <result property="account.loginId" column="login_id"/>
+    <result property="account.source" column="source"/>
+    <result property="account.email" column="email"/>
+    <result property="account.mobile" column="mobile"/>
+    <result property="account.creatIp" column="creat_ip"/>
+    <result property="account.lastLoginIp" column="last_login_ip"/>
+    <result property="account.loginTimes" column="login_times"/>
+    <result property="account.externalId" column="external_id"/>
+    <association property="profile" javaType="flcxilove.user.dao.po.Profile">
+      <id property="id" column="pfid"/>
+      <result property="nickName" column="nick_name"/>
+      <result property="avatar" column="avatar"/>
+      <result property="gender" column="gender"/>
+      <result property="aid" column="aid"/>
+    </association>
+    <collection property="roles" ofType="flcxilove.user.dao.po.Role" javaType="java.util.ArrayList">
+      <id property="id" column="rid"/>
+      <result property="code" column="rcode"/>
+      <result property="name" column="rname"/>
+    </collection>
+  </resultMap>
+
+  <resultMap id="selectRoleResultMap" type="flcxilove.user.dao.bo.RoleBo">
+    <id property="role.id" column="rid"/>
+    <result property="role.code" column="rcode"/>
+    <result property="role.name" column="rname"/>
+    <collection property="prole" ofType="flcxilove.user.dao.po.Role" javaType="java.util.ArrayList">
+      <id property="id" column="prid"/>
+      <result property="code" column="prcode"/>
+      <result property="name" column="prname"/>
+    </collection>
+  </resultMap>
+
+  <!-- 数据查询处理 -->
+  <select id="selectAccount" resultType="flcxilove.user.dao.po.Account">
+    SELECT acc.id
+    , acc.login_id
+    , acc.source
+    , acc.password
+    , acc.email
+    , acc.mobile
+    , acc.external_id
+    , acc.create_ip
+    , acc.last_login_ip
+    , acc.login_times
+    FROM Account acc
+    <trim prefix="WHERE" prefixOverrides="AND |OR ">
+      <if test="condition.id != null">And acc.id = #{condition.id}</if>
+      <if test="condition.loginId != null">And acc.login_id = #{condition.loginId}</if>
+      <if test="condition.source != null">And acc.source = #{condition.source}</if>
+      <if test="condition.email != null">And acc.email = #{condition.email}</if>
+      <if test="condition.mobile != null">And acc.mobile = #{condition.mobile}</if>
+      <if test="condition.externalId != null">And acc.externalId = #{condition.externalId}</if>
+      <if test="condition.lastLoginIp != null">And acc.lastLoginIp = #{condition.lastLoginIp}</if>
+      <if test="condition.loginTimes != null">And acc.loginTimes = #{condition.loginTimes}</if>
+    </trim>
+  </select>
+  <select id="selectUserInfo" resultMap="selectUserResultMap">
+    SELECT acc.id as aid
+    , acc.login_id as login_id
+    , acc.source as source
+    , acc.email as email
+    , acc.mobile as mobile
+    , acc.external_id as external_id
+    , acc.create_ip as create_ip
+    , acc.last_login_ip as last_login_ip
+    , acc.login_times as login_times
+    , pf.id as pfid
+    , pf.nickname as nickname
+    , pf.avatar as avatar
+    , pf.gender as gender
+    , rl.id as rid
+    , rl.code as rcode
+    , rl.name as rname
+    FROM Account acc
+    JOIN Profile pf ON pf.aid = acc.id
+    JOIN AccountAndRoleRel arrel ON acc.id = arrel.aid
+    JOIN Role rl ON rl.id = arrel.rid
+    <trim prefix="WHERE" prefixOverrides="AND |OR ">
+      <if test="condition.loginId != null">And acc.login_id = #{condition.loginId}</if>
+      <if test="condition.source != null">And acc.source = #{condition.source}</if>
+      And acc.status = 1
+    </trim>
+  </select>
+
+  <select id="selectRoles" resultMap="selectRoleResultMap">
+    SELECT
+    rl.id as rid
+    ,rl.code as rcode
+    ,rl.name as rname
+    ,prl.id as prid
+    ,prl.code as prcode
+    ,prl.name as prname
+    FROM Role rl
+    LEFT JOIN RoleRelation rlrel on rlrel.source = rl.id
+    LEFT JOIN Role prl on rlrel.target = prl.id
+    <if test="condition != null">
+      <trim prefix="WHERE" prefixOverrides="AND |OR ">
+        <if test="condition.id != null">And rl.id = #{condition.id}</if>
+        <if test="condition.code != null">And rl.code = #{condition.code}</if>
+        <if test="condition.name != null">And rl.name = #{condition.name}</if>
+        <if test="condition.pid != null">And prl.id = #{condition.pid}</if>
+      </trim>
+    </if>
+    ORDER BY
+    rl.code
+    ,prl.code
+  </select>
+  <select id="selectRolesByCodes" resultType="flcxilove.user.dao.po.Role">
+    SELECT rl.id
+    , rl.code
+    , rl.name
+    FROM Role rl
+    WHERE rl.code IN
+    <foreach collection="rcodes" item="rcode" index="idx" separator="," open="(" close=")">
+      #{rcode}
+    </foreach>
+  </select>
+
+  <!-- 单表信息处理 -->
+  <insert id="insertAccount" parameterType="flcxilove.user.dao.po.Account">
+    INSERT INTO Account(login_id, source, email, mobile, password, external_id, create_ip,
+                        last_login_ip)
+    VALUES (#{content.loginId}, #{content.source}, #{content.email}, #{content.mobile},
+            #{content.password}, #{content.externalId}, #{content.creatIp}, #{content.lastLoginIp});
+  </insert>
+  <update id="updateAccount">
+    UPDATE Account
+    <trim prefix="SET" suffixOverrides=",">
+      <if test="content.password != null and content.password != ''">password =
+        #{content.password},
+      </if>
+      <if test="content.email != null">email = #{content.email},</if>
+      <if test="content.mobile != null">mobile = #{content.mobile},</if>
+      <if test="content.externalId != null">external_id = #{content.externalId},</if>
+      <if test="content.lastLoginIp != null">last_login_ip = #{content.lastLoginIp},</if>
+      <if test="content.loginTimes != null">login_times = #{content.loginTimes},</if>
+    </trim>
+    <trim prefix="WHERE" prefixOverrides="AND |OR ">
+      <if test="condition.loginId != null">And login_id = #{condition.loginId}</if>
+      <if test="condition.source != null">And source = #{condition.source}</if>
+      <if test="condition.email != null">And email = #{condition.email}</if>
+      <if test="condition.mobile != null">And mobile = #{condition.mobile}</if>
+      <if test="condition.externalId != null">And external_id = #{condition.externalId}</if>
+      <if test="condition.creatIp != null">And creat_ip = #{condition.creatIp}</if>
+      <if test="condition.lastLoginIp != null">And last_login_ip = #{condition.lastLoginIp}</if>
+      <if test="condition.loginTimes != null">And login_times = #{condition.loginTimes}</if>
+    </trim>
+  </update>
+  <insert id="insertProfile" parameterType="flcxilove.user.dao.po.Profile">
+    INSERT INTO Profile(nickname, avatar, gender, aid)
+    VALUES (#{content.nickName}, #{content.avatar}, #{content.gender}, #{content.aid});
+  </insert>
+  <update id="updateProfile">
+    UPDATE Profile
+    <trim prefix="SET" suffixOverrides=",">
+      <if test="content.nickName != null">nickname = #{content.nickName},</if>
+      <if test="content.avatar != null">avatar = #{content.avatar},</if>
+      <if test="content.gender != null">gender = #{content.gender},</if>
+    </trim>
+    <trim prefix="WHERE" prefixOverrides="AND |OR ">
+      <if test="condition.aid != null">And aid = #{condition.aid}</if>
+      <if test="condition.nickName != null">And nickName = #{condition.nickName}</if>
+    </trim>
+  </update>
+
+  <!-- 关联表信息处理 -->
+  <insert id="insertAccountAndRoleRel">
+    INSERT INTO AccountAndRoleRel(aid, rid)
+    VALUES (#{aid}, #{rid});
+  </insert>
+  <insert id="batchRoleToAccount">
+    INSERT INTO AccountAndRoleRel(aid, rid)
+    VALUES
+    <foreach collection="rels" item="rel" separator="," close=";">
+      (#{rel.aid}, #{rel.rid})
+    </foreach>
+  </insert>
+  <insert id="insertRoleAndPrivilegeRel">
+    INSERT INTO RoleAndPrivilegeRel(rid, pid)
+    VALUES (#{rid}, #{pid});
+  </insert>
+
+</mapper>

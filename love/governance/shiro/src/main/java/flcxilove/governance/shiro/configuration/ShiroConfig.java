@@ -11,6 +11,7 @@ import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 
 /**
  * Shiro配置
@@ -20,6 +21,7 @@ import org.springframework.context.annotation.Configuration;
  * @since 2019-03-18 12:04
  */
 @Configuration
+@DependsOn("message")
 public class ShiroConfig {
 
   @Resource

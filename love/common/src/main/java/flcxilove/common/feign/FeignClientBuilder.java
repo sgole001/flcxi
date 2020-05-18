@@ -14,6 +14,7 @@ public interface FeignClientBuilder {
   /**
    * 构建Feign服务提供者
    *
+   * @param apiClass API接口类
    * @param serviceName 服务提供者服务名
    *
    * @return Feign服务提供者客户端

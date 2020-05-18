@@ -1,14 +1,20 @@
 package flcxilove.governance.shiro.filter;
 
+import flcxilove.common.tools.MessageUtil;
+import flcxilove.governance.shiro.constant.ShiroConstant;
 import flcxilove.governance.shiro.token.JwtAuthenticationToken;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.Subject;
-import org.apache.shiro.web.filter.PathMatchingFilter;
+import org.apache.shiro.web.util.WebUtils;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.util.StringUtils;
 
 /**
  * ShiroJwt认证过滤器
@@ -17,64 +23,93 @@ import org.apache.shiro.web.filter.PathMatchingFilter;
  * @since: 2018/11/6
  * @version: 1.0
  */
-public class JwtAuth2Filter extends PathMatchingFilter {
+public class JwtAuth2Filter extends RestControlFilter {
 
   /**
-   * 过滤器编号
+   * 过滤器别名
    */
-  public static final String FILTER_CODE = "jwt";
+  public final static String FILTER_ALIAS = "jwt";
 
   /**
    * 日志管理器
    */
-  private Logger logger = LogManager.getLogger(JwtAuth2Filter.class.getName());
+  private Logger logger = LogManager.getLogger(JwtAuth2Filter.class);
 
+  @Override
   protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
-
-    try {
-
-      // 从header中获取token
-      String jwt = ((HttpServletRequest) request).getHeader("jwt");
-
-      // 认证Token对象
-      JwtAuthenticationToken token = new JwtAuthenticationToken(jwt);
-      // 当前用户对象登陆
-      SecurityUtils.getSubject().login(token);
-
-      return Boolean.TRUE;
-
-    } catch (Exception e) {
-      logger.error(e.getCause().getMessage());
-    }
-
-    return Boolean.FALSE;
-  }
-
-  protected boolean onAccessDenied(ServletRequest servletRequest, ServletResponse servletResponse) throws Exception {
 
     Subject subject = SecurityUtils.getSubject();
 
-    // 未认证的情况
-    if (null == subject || !subject.isAuthenticated()) {
-      // 告知客户端JWT认证失败需跳转到登录页面
-      logger.info("告知客户端JWT认证失败需跳转到登录页面");
-    }
-    // 已经认证但未授权的情况
-    else {
-      // 告知客户端JWT没有权限访问此资源
-      logger.info("告知客户端JWT没有权限访问此资源");
+    if (null != subject && subject.isAuthenticated()) {
+      return Boolean.TRUE;
     }
 
-    // 过滤链终止
     return Boolean.FALSE;
   }
 
+  @Override
   protected boolean onAccessDenied(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {
-    return this.onAccessDenied(request, response);
+
+    // 对外错误信息
+    String msgError = MessageUtil.accessor.getMessage(ShiroConstant.MSG_SHIRO_SYS_00000);
+
+    if (this.isJwtHttpRequest(request)) {
+
+      // 构建认证Token对象
+      JwtAuthenticationToken token = this.buildJwtAuthToken(request);
+
+      try {
+        // 当前用户对象登陆
+        SecurityUtils.getSubject().login(token);
+
+        return Boolean.TRUE;
+      } catch (AuthenticationException e) {
+        logger.error(msgError, e);
+      }
+    }
+
+    // 错误信息返回
+    WebUtils.toHttp(response).sendError(HttpServletResponse.SC_UNAUTHORIZED, msgError);
+
+    return Boolean.FALSE;
   }
 
-  @Override
-  public boolean onPreHandle(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {
-    return this.isAccessAllowed(request, response, mappedValue) || this.onAccessDenied(request, response, mappedValue);
+  /**
+   * 判定是否HTTP请求，并且头部存在JWT信息
+   *
+   * @param request ServletRequest
+   *
+   * @return 判定结果
+   */
+  private boolean isJwtHttpRequest(ServletRequest request) {
+
+    // 判定是否HTTP请求
+    if (request instanceof HttpServletRequest) {
+
+      // 从header中获取JWT信息
+      String jwt = WebUtils.toHttp(request).getHeader(ShiroConstant.JWT_AUTH_HTTP_HEAD);
+
+      if (!StringUtils.isEmpty(jwt)) {
+        return Boolean.TRUE;
+      }
+    }
+
+    return Boolean.FALSE;
+  }
+
+  /**
+   * 构建认证Token对象
+   *
+   * @param request ServletRequest
+   *
+   * @return 认证Token对象
+   */
+  @NotNull
+  private JwtAuthenticationToken buildJwtAuthToken(ServletRequest request) {
+
+    // 从header中获取JWT信息
+    String jwt = WebUtils.toHttp(request).getHeader(ShiroConstant.JWT_AUTH_HTTP_HEAD);
+
+    return new JwtAuthenticationToken(jwt);
   }
 }

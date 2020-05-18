@@ -14,6 +14,7 @@ import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.codec.Base64;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
@@ -60,13 +61,22 @@ public class JwtRealm extends AuthorizingRealm {
     String clientId = (String) principalCollection.getPrimaryPrincipal();
 
     // 根据用户ID获取用户权限
-//        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
-//        info.setRoles(null);
-//        info.setStringPermissions(null);
+    SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+    info.setRoles(null);
+    info.setStringPermissions(null);
 
-    return null;
+    return info;
   }
 
+  /**
+   * 用户认证处理方法
+   *
+   * @param authenticationToken 认证用信息（JWT）
+   *
+   * @return 认证信息
+   *
+   * @throws AuthenticationException
+   */
   @Override
   protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
 

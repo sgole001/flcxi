@@ -11,27 +11,32 @@ import org.apache.shiro.authc.AuthenticationToken;
  */
 public class JwtAuthenticationToken implements AuthenticationToken {
 
-    /**
-     * JWT信息
-     */
-    private String token;
+  /**
+   * 序列化和反序列化
+   */
+  private static final long serialVersionUID = 8422023104805659853L;
 
-    /**
-     * 构造函数
-     *
-     * @param token JWT信息
-     */
-    public JwtAuthenticationToken(String token) {
-        this.token = token;
-    }
+  /**
+   * JWT信息
+   */
+  private String token;
 
-    @Override
-    public Object getPrincipal() {
-        return this.token;
-    }
+  /**
+   * 构造函数
+   *
+   * @param token JWT信息
+   */
+  public JwtAuthenticationToken(String token) {
+    this.token = token;
+  }
 
-    @Override
-    public Object getCredentials() {
-        return this.token;
-    }
+  @Override
+  public Object getPrincipal() {
+    return this.token;
+  }
+
+  @Override
+  public Object getCredentials() {
+    return this.token;
+  }
 }

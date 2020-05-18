@@ -34,16 +34,12 @@ public class DefaultShiroService implements ShiroService {
   @Override
   public List<ShiroFilterChain> findShiroFilterChain() {
 
-    logger.trace(MessageUtil.accessor.getMessage(ShiroConstant.MSG_SHIRO_SYS_00000, new String[]{"DefaultShiroService$findShiroFilterChain"}));
-
     // 查询Shiro过滤规则信息
     List<ShiroFilterChain> shiroFilterChains = this.shiroFilterChainMapper.selectShiroFilterChain();
 
     if (CollectionUtils.isEmpty(shiroFilterChains)) {
       logger.warn(MessageUtil.accessor.getMessage(ShiroConstant.MSG_SHIRO_BIZ_00000));
     }
-
-    logger.trace(MessageUtil.accessor.getMessage(ShiroConstant.MSG_SHIRO_SYS_00001, new String[]{"DefaultShiroService$findShiroFilterChain"}));
 
     return shiroFilterChains;
   }

@@ -1,10 +1,11 @@
 package flcxilove.user.service.user;
 
-import flcxilove.user.api.request.CreateUsersRequestMessage;
-import flcxilove.user.api.response.data.UserData;
+import flcxilove.user.service.dto.AccountDto;
+import flcxilove.user.service.dto.ProfileDto;
+import flcxilove.user.service.dto.UserDto;
 
 /**
- * 用户信息相关逻辑服务接口
+ * 用户服务中心接口
  *
  * @author sgole
  * @version v1.0
@@ -13,20 +14,21 @@ import flcxilove.user.api.response.data.UserData;
 public interface UserService {
 
   /**
-   * 通过用户ID获取用户信息
+   * 用户注册处理
    *
-   * @param uid 用户ID
+   * @param account 账户注册信息
+   * @param profile 账户简要信息
    *
-   * @return 用户信息
+   * @return 注册用户信息DTO
    */
-  UserData searchUserInfo(final String uid);
+  UserDto enroll(AccountDto account, ProfileDto profile);
 
   /**
-   * 创建用户信息
+   * 用户登录处理
    *
-   * @param requestMessage 创建用用户信息
+   * @param account 账户登录信息
    *
-   * @return 创建后用户信息
+   * @return 登录用户信息DTO
    */
-  UserData createUser(final CreateUsersRequestMessage requestMessage);
+  UserDto login(AccountDto account);
 }
